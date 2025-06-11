@@ -1,0 +1,36 @@
+using UnityEngine;
+
+public class FirePulseInstance : AbilityInstance
+{
+    [SerializeField]
+    private bool destroy;
+
+    protected override void Update()
+    {
+        if(destroy)
+            gameObject.SetActive(false);
+            //AbilitiesUtilities.DestroyAbilitiesInstance(gameObject);
+        transform.position = GameManager.Instance.Player.transform.position + new Vector3(0, -0.5f,0);
+    }
+
+    protected void OnTriggerEnter2D(Collider2D other)
+    {
+        if(other.TryGetComponent<EnemyCombatEntity>(out var enemyCombatEntity))
+        {
+            enemyCombatEntity.ApplyDamage(GameManager.Instance.playerCombatEntity, skillContainer);
+            enemyCombatEntity.ApplyDebuff(enemyCombatEntity, DebuffType.Burn);
+        }
+    }
+
+    public override void Init(SkillContainer _skillContainer)
+    {
+        base.Init(_skillContainer);
+        destroy = false;
+    }
+
+    public override void UseInstance()
+    {
+        base.UseInstance();
+        destroy = false;
+    }
+}
